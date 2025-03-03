@@ -14,8 +14,17 @@
     {
       "name": "clean-folder",
       "title": "Clean Folder",
-      "description": "",
-      "mode": "view"
+      "description": "Will clean your folder",
+      "mode": "view",
+      "preferences": [
+        {
+          "type": "directory",
+          "name": "downloadFolder",
+          "title": "Downloads Folder",
+          "description": "Folder to Clean",
+          "required": true
+        }
+      ]
     }
   ],
   "dependencies": {
@@ -32,6 +41,7 @@
   },
   "scripts": {
     "build": "ray build",
+    "install": "ray install",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",

@@ -1,7 +1,12 @@
-import { Icon, List } from "@raycast/api";
-import { existsSync, lstatSync, readdirSync, renameSync, rmSync } from "node:fs";
-import { homedir } from "node:os";
-import { basename, extname, join, parse } from "node:path";
+import { useCallback, useState } from "react";
+
+import { Action, ActionPanel, Detail, getPreferenceValues, Icon, List } from "@raycast/api";
+
+import { isFile } from "./utils/file";
+import { Preferences } from "./types/preferences";
+
+import { existsSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { basename, extname, join } from "node:path";
 
 const folders = {
   Documents: [".pdf", ".doc", ".docx", ".txt"],
@@ -16,18 +21,11 @@ const folders = {
 };
 type FoldersType = (keyof typeof folders)[];
 
-const PARSED_DOWNLOADS = parse("/Downloads");
-const DOWNLOADS_PATH = join(homedir(), PARSED_DOWNLOADS.name);
 const FOLDERS = Object.keys(folders) as FoldersType;
 const DATE_REGEX = /^(2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$/;
 
-const isFile = (filename: string) => {
-  const filePath = join(DOWNLOADS_PATH, filename);
-  return lstatSync(filePath).isFile();
-};
-
-const moveOrDelete = (folder: string, file: string, currentPath: string) => {
-  const newPath = join(DOWNLOADS_PATH, folder, file);
+const moveOrDelete = (folder: string, file: string, currentPath: string, folderPath: string) => {
+  const newPath = join(folderPath, folder, file);
   if (!existsSync(newPath)) {
     renameSync(currentPath, newPath);
   } else {
@@ -45,33 +43,54 @@ const moveOrDelete = (folder: string, file: string, currentPath: string) => {
 //   }
 // };
 
+const CleanFolder = () => {
+  return <Detail markdown="# Everything cleaned!" />;
+};
+
 const Command = () => {
-  const downloadFiles = readdirSync(DOWNLOADS_PATH).filter(isFile);
+  const { downloadFolder } = getPreferenceValues<Preferences>();
+  const [downloadFiles] = useState<string[]>(() => {
+    const readDownloadFolder = readdirSync(downloadFolder);
+    return readDownloadFolder.filter((file) => {
+      return isFile({ filename: file, folderPath: downloadFolder });
+    });
+  });
 
-  for (const file of downloadFiles) {
-    const currentPath = join(DOWNLOADS_PATH, file);
-    const extension = extname(file).toLocaleLowerCase();
-    const fileName = basename(file, extension);
+  const cleanAllFiles = useCallback(() => {
+    for (const file of downloadFiles) {
+      const currentPath = join(downloadFolder, file);
+      const extension = extname(file).toLocaleLowerCase();
+      const fileName = basename(file, extension);
 
-    const datePortion = fileName.split("_")[1];
-    if (datePortion && DATE_REGEX.test(datePortion)) {
-      moveOrDelete("Cafe", file, currentPath);
-      continue;
-    }
+      const datePortion = fileName.split("_")[1];
+      if (datePortion && DATE_REGEX.test(datePortion)) {
+        moveOrDelete("Cafe", file, currentPath, downloadFolder);
+        continue;
+      }
 
-    for (const folder of FOLDERS) {
-      const ext = folders[folder];
+      for (const folder of FOLDERS) {
+        const ext = folders[folder];
 
-      if (ext.includes(extension)) {
-        moveOrDelete(folder, file, currentPath);
+        if (ext.includes(extension)) {
+          moveOrDelete(folder, file, currentPath, downloadFolder);
+        }
       }
     }
-  }
+  }, [downloadFiles]);
 
   return (
     <List>
       {downloadFiles.map((file) => (
-        <List.Item key={file} icon={Icon.Document} title={file} />
+        <List.Item
+          key={file}
+          icon={Icon.Document}
+          title={file}
+          actions={
+            <ActionPanel title="Some tITLE">
+              <Action.Push title="Push It's a Boy" onPush={cleanAllFiles} target={<CleanFolder />} />
+            </ActionPanel>
+          }
+        />
       ))}
     </List>
   );
