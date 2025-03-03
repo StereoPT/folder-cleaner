@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { Action, ActionPanel, Detail, getPreferenceValues, Icon, List } from "@raycast/api";
+import { Action, ActionPanel, getPreferenceValues, Icon, List, showHUD } from "@raycast/api";
 
 import { isFile } from "./utils/file";
 import { Preferences } from "./types/preferences";
@@ -43,10 +43,6 @@ const moveOrDelete = (folder: string, file: string, currentPath: string, folderP
 //   }
 // };
 
-const CleanFolder = () => {
-  return <Detail markdown="# Everything cleaned!" />;
-};
-
 const Command = () => {
   const { downloadFolder } = getPreferenceValues<Preferences>();
   const [downloadFiles] = useState<string[]>(() => {
@@ -76,18 +72,20 @@ const Command = () => {
         }
       }
     }
+
+    return showHUD("Folder Cleaned");
   }, [downloadFiles]);
 
   return (
-    <List>
+    <List navigationTitle="Files inside Folder">
       {downloadFiles.map((file) => (
         <List.Item
           key={file}
           icon={Icon.Document}
           title={file}
           actions={
-            <ActionPanel title="Some tITLE">
-              <Action.Push title="Push It's a Boy" onPush={cleanAllFiles} target={<CleanFolder />} />
+            <ActionPanel title="Cleaner Actions">
+              <Action title="Clean All" onAction={cleanAllFiles} />
             </ActionPanel>
           }
         />
