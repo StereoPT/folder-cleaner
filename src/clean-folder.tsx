@@ -5,13 +5,11 @@ import { Action, ActionPanel, getPreferenceValues, Icon, List, showHUD } from "@
 import { moveOrDelete } from "./utils/files";
 import { Preferences } from "./types/preferences";
 
-import { basename, extname, join } from "node:path";
+import { extname, join } from "node:path";
 import { SetupFoldersAction } from "./components/setup-folders";
 import { useFetchFolderFiles } from "./hooks/useFetchFolderFiles";
 import { Folder } from "./types/folders";
 import { useFetchStoredFolders } from "./hooks/useFetchStoredFolders";
-
-const DATE_REGEX = /^(2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$/;
 
 const CleanFolderCommand = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,18 +25,6 @@ const CleanFolderCommand = () => {
     for (const file of folderFiles) {
       const currentPath = join(folderToClean, file);
       const extension = extname(file).toLocaleLowerCase();
-      const fileName = basename(file, extension);
-
-      const datePortion = fileName.split("_")[1];
-      if (datePortion && DATE_REGEX.test(datePortion)) {
-        moveOrDelete({
-          folder: "Cafe",
-          file,
-          currentPath,
-          folderPath: folderToClean,
-        });
-        continue;
-      }
 
       for (const { name, extensions } of folders) {
         if (extensions.includes(extension)) {
@@ -53,7 +39,7 @@ const CleanFolderCommand = () => {
     }
 
     return showHUD("Folder Cleaned");
-  }, [folderFiles]);
+  }, [folderFiles, folders]);
 
   return (
     <List
