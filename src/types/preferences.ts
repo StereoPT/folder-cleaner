@@ -1,3 +1,3 @@
 export type Preferences = {
-  downloadFolder: string;
+  folderToClean: string;
 };

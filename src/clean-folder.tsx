@@ -7,36 +7,23 @@ import { Preferences } from "./types/preferences";
 
 import { readdirSync } from "node:fs";
 import { basename, extname, join } from "node:path";
+import { defaultFolders, SetupFoldersAction } from "./setup-folders";
 
-const folders = {
-  Documents: [".pdf", ".doc", ".docx", ".txt"],
-  Images: [".jpeg", ".png", ".jpg", ".svg", ".psd"],
-  Programs: [".exe", ".dmg", ".apk", ".jar"],
-  Coding: [".js", ".md", ".py", ".json", ".ipynb"],
-  Archives: [".zip", ".rar", ".7z", ".gz"],
-  Sheets: [".csv", ".xls", ".xlsx"],
-  Slides: [".ppt", ".pptx"],
-  Music: [".mp3"],
-  Video: [".mov"],
-};
-type FoldersType = (keyof typeof folders)[];
-
-const FOLDERS = Object.keys(folders) as FoldersType;
 const DATE_REGEX = /^(2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$/;
 
 const CleanFolderCommand = () => {
-  const { downloadFolder } = getPreferenceValues<Preferences>();
+  const { folderToClean } = getPreferenceValues<Preferences>();
 
   const [downloadFiles] = useState<string[]>(() => {
-    const readDownloadFolder = readdirSync(downloadFolder);
+    const readDownloadFolder = readdirSync(folderToClean);
     return readDownloadFolder.filter((file) => {
-      return isFile({ filename: file, folderPath: downloadFolder });
+      return isFile({ filename: file, folderPath: folderToClean });
     });
   });
 
   const cleanAllFiles = useCallback(() => {
     for (const file of downloadFiles) {
-      const currentPath = join(downloadFolder, file);
+      const currentPath = join(folderToClean, file);
       const extension = extname(file).toLocaleLowerCase();
       const fileName = basename(file, extension);
 
@@ -46,20 +33,18 @@ const CleanFolderCommand = () => {
           folder: "Cafe",
           file,
           currentPath,
-          folderPath: downloadFolder,
+          folderPath: folderToClean,
         });
         continue;
       }
 
-      for (const folder of FOLDERS) {
-        const ext = folders[folder];
-
-        if (ext.includes(extension)) {
+      for (const { name, extensions } of defaultFolders) {
+        if (extensions.includes(extension)) {
           moveOrDelete({
-            folder,
+            folder: name,
             file,
             currentPath,
-            folderPath: downloadFolder,
+            folderPath: folderToClean,
           });
         }
       }
@@ -69,15 +54,27 @@ const CleanFolderCommand = () => {
   }, [downloadFiles]);
 
   return (
-    <List navigationTitle="Files inside Folder">
+    <List
+      navigationTitle="Files inside Folder"
+      actions={
+        <ActionPanel>
+          <SetupFoldersAction />
+        </ActionPanel>
+      }
+    >
       {downloadFiles.map((file) => (
         <List.Item
           key={file}
           icon={Icon.Document}
           title={file}
           actions={
-            <ActionPanel title="Cleaner Actions">
-              <Action title="Clean All" onAction={cleanAllFiles} />
+            <ActionPanel>
+              <ActionPanel.Section title="Cleaner Actions">
+                <Action title="Clean All" onAction={cleanAllFiles} />
+              </ActionPanel.Section>
+              <ActionPanel.Section title="Settings">
+                <SetupFoldersAction />
+              </ActionPanel.Section>
             </ActionPanel>
           }
         />

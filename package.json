@@ -19,17 +19,17 @@
       "preferences": [
         {
           "type": "directory",
-          "name": "downloadFolder",
-          "title": "Downloads Folder",
-          "description": "Folder to Clean",
+          "name": "folderToClean",
+          "title": "Folder to Clean",
+          "description": "Select what folder you want to clean",
           "required": true
         }
       ]
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.93.0",
-    "@raycast/utils": "^1.17.0"
+    "@raycast/api": "^1.93.1",
+    "@raycast/utils": "^1.19.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.11",
