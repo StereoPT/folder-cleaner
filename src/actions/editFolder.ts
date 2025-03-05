@@ -18,6 +18,7 @@ export const EditFolder = async ({ folderName, editedFolder, existingFolders, se
   const newFolderList = existingFolders.map((f) => (f.name === foundFolder.name ? editedFolder : f));
   setFolders(newFolderList);
 
-  await LocalStorage.setItem(foundFolder.name, JSON.stringify(editedFolder));
+  await LocalStorage.removeItem(foundFolder.name);
+  await LocalStorage.setItem(editedFolder.name, JSON.stringify(editedFolder));
   await showToast(Toast.Style.Success, "Folder Edited");
 };
