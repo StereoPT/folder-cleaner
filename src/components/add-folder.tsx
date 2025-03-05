@@ -1,13 +1,8 @@
-import { Action, ActionPanel, Form, Icon, useNavigation } from "@raycast/api";
-import { availableExtensions } from "../utils/availableExtensions";
+import { Action, Icon, useNavigation } from "@raycast/api";
 import { Folder } from "../types/folders";
+import { FolderForm, FormValues } from "./folder-form";
 
-type FormValues = {
-  folderName: string;
-  extensions: string[];
-};
-
-type FolderFormProps =
+type FolderFormSwitcherProps =
   | {
       type: "create";
       onCreate: (folder: Folder) => void;
@@ -18,37 +13,42 @@ type FolderFormProps =
       onEdit: (oldFolder: Folder, newFolder: Folder) => void;
     };
 
-const FolderForm = (props: FolderFormProps) => {
+const FolderFormSwitcher = (props: FolderFormSwitcherProps) => {
   const { pop } = useNavigation();
 
-  const handleSubmit = (values: FormValues) => {
-    const newFolder = { name: values.folderName, extensions: values.extensions };
+  switch (props.type) {
+    case "create": {
+      const handleSubmit = (values: FormValues) => {
+        const newFolder = { name: values.folderName, extensions: values.extensions };
+        props.onCreate(newFolder);
 
-    if (props.type === "create") {
-      props.onCreate(newFolder);
-    } else if (props.type === "edit") {
-      props.onEdit(props.folder, newFolder);
+        pop();
+      };
+
+      return <FolderForm submitText="Add Folder" handleSubmit={handleSubmit} />;
     }
+    case "edit": {
+      const { folder } = props;
 
-    pop();
-  };
+      const handleSubmit = (values: FormValues) => {
+        const newFolder = { name: values.folderName, extensions: values.extensions };
+        props.onEdit(props.folder, newFolder);
 
-  return (
-    <Form
-      actions={
-        <ActionPanel>
-          <Action.SubmitForm title={props.type === "create" ? "Add Folder" : "Edit Folder"} onSubmit={handleSubmit} />
-        </ActionPanel>
-      }
-    >
-      <Form.TextField id="folderName" title="Folder Name" value={props.type === "edit" ? props.folder.name : ""} />
-      <Form.TagPicker id="extensions" title="Extensions" value={props.type === "edit" ? props.folder.extensions : []}>
-        {availableExtensions.map((extension) => (
-          <Form.TagPicker.Item key={extension.value} value={extension.value} title={extension.title} />
-        ))}
-      </Form.TagPicker>
-    </Form>
-  );
+        pop();
+      };
+
+      return (
+        <FolderForm
+          submitText="Edit Folder"
+          defaultFolderName={folder.name}
+          defaultFolderExtenstions={folder.extensions}
+          handleSubmit={handleSubmit}
+        />
+      );
+    }
+    default:
+      throw new Error("Invalid Form Type");
+  }
 };
 
 type AddFoldersActionProps = {
@@ -57,7 +57,11 @@ type AddFoldersActionProps = {
 
 export const AddFoldersAction = ({ onCreate }: AddFoldersActionProps) => {
   return (
-    <Action.Push icon={Icon.PlusCircle} title="Add Folder" target={<FolderForm type="create" onCreate={onCreate} />} />
+    <Action.Push
+      icon={Icon.PlusCircle}
+      title="Add Folder"
+      target={<FolderFormSwitcher type="create" onCreate={onCreate} />}
+    />
   );
 };
 
@@ -71,7 +75,7 @@ export const EditFolderAction = ({ folder, onEdit }: EditFolderActionProps) => {
     <Action.Push
       icon={Icon.Pencil}
       title="Edit Folder"
-      target={<FolderForm type="edit" folder={folder} onEdit={onEdit} />}
+      target={<FolderFormSwitcher type="edit" folder={folder} onEdit={onEdit} />}
     />
   );
 };
