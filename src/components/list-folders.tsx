@@ -1,17 +1,13 @@
 import { Action, ActionPanel, Icon, List, showToast, Toast } from "@raycast/api";
-import { useState } from "react";
 import { Folder } from "../types/folders";
-import { useFetchStoredFolders } from "../hooks/useFetchStoredFolders";
 import { AddFoldersAction, EditFolderAction } from "./add-folder";
 import { CreateNewFolder } from "../actions/createNewFolder";
 import { DeleteFolder } from "../actions/deleteFolder";
 import { EditFolder } from "../actions/editFolder";
+import { useFetchStoredFolders } from "../hooks/useFetchStoredFolders";
 
 const ListFolders = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [folders, setFolders] = useState<Folder[]>([]);
-
-  useFetchStoredFolders({ setFolders, setIsLoading });
+  const { folders, setFolders, isLoading } = useFetchStoredFolders();
 
   const createNewFolder = async (folder: Folder) => {
     try {

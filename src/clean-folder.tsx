@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import { Action, ActionPanel, getPreferenceValues, Icon, List, showHUD } from "@raycast/api";
 
@@ -8,18 +8,15 @@ import { Preferences } from "./types/preferences";
 import { extname, join } from "node:path";
 import { ListFoldersAction } from "./components/list-folders";
 import { useFetchFolderFiles } from "./hooks/useFetchFolderFiles";
-import { Folder } from "./types/folders";
 import { useFetchStoredFolders } from "./hooks/useFetchStoredFolders";
 
 const CleanFolderCommand = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [folderFiles, setFolderFiles] = useState<string[]>([]);
-
   const { folderToClean } = getPreferenceValues<Preferences>();
 
-  useFetchStoredFolders({ setFolders, setIsLoading });
-  useFetchFolderFiles({ setFolderFiles, setIsLoading });
+  const { folders, isLoading: isLoadingFolders } = useFetchStoredFolders();
+  const { folderFiles, isLoading: isLoadingFiles } = useFetchFolderFiles(folderToClean);
+
+  const isLoading = isLoadingFolders && isLoadingFiles;
 
   const cleanAllFiles = useCallback(() => {
     for (const file of folderFiles) {
@@ -58,9 +55,11 @@ const CleanFolderCommand = () => {
           title={file}
           actions={
             <ActionPanel>
-              <ActionPanel.Section title="Cleaner Actions">
-                <Action title="Clean All" onAction={cleanAllFiles} />
-              </ActionPanel.Section>
+              {folders.length > 0 && (
+                <ActionPanel.Section title="Cleaner Actions">
+                  <Action title="Clean All" onAction={cleanAllFiles} />
+                </ActionPanel.Section>
+              )}
               <ActionPanel.Section title="Settings">
                 <ListFoldersAction />
               </ActionPanel.Section>

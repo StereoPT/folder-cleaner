@@ -17,8 +17,6 @@ export const DeleteFolder = async ({ folderName, existingFolders, setFolders }: 
   const newFolderList = existingFolders.filter((f) => f.name !== foundFolder.name);
   setFolders(newFolderList);
 
-  console.log(await LocalStorage.allItems());
-
   await LocalStorage.removeItem(foundFolder.name);
   await showToast(Toast.Style.Success, "Folder Deleted");
 };

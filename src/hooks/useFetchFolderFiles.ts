@@ -1,17 +1,12 @@
-import { captureException, getPreferenceValues } from "@raycast/api";
-import { Dispatch, SetStateAction, useEffect } from "react";
-import { Preferences } from "../types/preferences";
+import { captureException } from "@raycast/api";
+import { useEffect, useState } from "react";
 import { readdir } from "node:fs/promises";
 import { isFile } from "../utils/files";
 import { buildException } from "../utils/buildException";
 
-type useFetchFolderFilesProps = {
-  setFolderFiles: Dispatch<SetStateAction<string[]>>;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
-};
-
-export const useFetchFolderFiles = ({ setFolderFiles, setIsLoading }: useFetchFolderFilesProps) => {
-  const { folderToClean } = getPreferenceValues<Preferences>();
+export const useFetchFolderFiles = (folderToClean: string) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [folderFiles, setFolderFiles] = useState<string[]>([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -37,4 +32,9 @@ export const useFetchFolderFiles = ({ setFolderFiles, setIsLoading }: useFetchFo
 
     void fetchFolderFiles();
   }, []);
+
+  return {
+    folderFiles,
+    isLoading,
+  };
 };

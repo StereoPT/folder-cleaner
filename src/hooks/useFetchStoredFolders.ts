@@ -1,14 +1,12 @@
 import { captureException, LocalStorage } from "@raycast/api";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Folder } from "../types/folders";
 import { buildException } from "../utils/buildException";
 
-type useFetchStoredFoldersProps = {
-  setFolders: Dispatch<SetStateAction<Folder[]>>;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
-};
+export const useFetchStoredFolders = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [folders, setFolders] = useState<Folder[]>([]);
 
-export const useFetchStoredFolders = ({ setFolders, setIsLoading }: useFetchStoredFoldersProps) => {
   useEffect(() => {
     setIsLoading(false);
     const fetchFoldersFromLocalStorage = async () => {
@@ -38,4 +36,10 @@ export const useFetchStoredFolders = ({ setFolders, setIsLoading }: useFetchStor
 
     void fetchFoldersFromLocalStorage();
   }, []);
+
+  return {
+    folders,
+    setFolders,
+    isLoading,
+  };
 };
