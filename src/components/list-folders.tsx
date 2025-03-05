@@ -19,15 +19,15 @@ const ListFolders = () => {
 
   const editFolder = async (oldFolder: Folder, newFolder: Folder) => {
     try {
-      await EditFolder({ folderName: oldFolder.name, editedFolder: newFolder, existingFolders: folders, setFolders });
+      await EditFolder({ folderId: oldFolder.id, editedFolder: newFolder, existingFolders: folders, setFolders });
     } catch (e) {
       await showToast(Toast.Style.Failure, "Folder not edited", "Something went wrong!");
     }
   };
 
-  const deleteFolder = async (folderName: string) => {
+  const deleteFolder = async (folderId: string) => {
     try {
-      await DeleteFolder({ folderName, existingFolders: folders, setFolders });
+      await DeleteFolder({ folderId, existingFolders: folders, setFolders });
     } catch (e) {
       await showToast(Toast.Style.Failure, "Folder not deleted", "Something went wrong!");
     }
@@ -46,12 +46,14 @@ const ListFolders = () => {
       {folders?.map((folder) => {
         return (
           <List.Item
-            title={folder.name}
-            key={folder.name}
+            title={folder.id}
+            key={folder.id}
             detail={
               <List.Item.Detail
                 metadata={
                   <List.Item.Detail.Metadata>
+                    <List.Item.Detail.Metadata.Label icon={Icon.Folder} title={folder.path} />
+                    <List.Item.Detail.Metadata.Separator />
                     <List.Item.Detail.Metadata.TagList title="Extensions">
                       {folder.extensions.map((extension) => (
                         <List.Item.Detail.Metadata.TagList.Item key={extension} text={extension} />
@@ -65,7 +67,7 @@ const ListFolders = () => {
               <ActionPanel>
                 <AddFoldersAction onCreate={createNewFolder} />
                 <EditFolderAction folder={folder} onEdit={editFolder} />
-                <Action icon={Icon.Trash} title="Delete Folder" onAction={() => deleteFolder(folder.name)} />
+                <Action icon={Icon.Trash} title="Delete Folder" onAction={() => deleteFolder(folder.id)} />
               </ActionPanel>
             }
           />

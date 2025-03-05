@@ -2,13 +2,15 @@ import { Action, ActionPanel, Form } from "@raycast/api";
 import { availableExtensions } from "../utils/availableExtensions";
 
 export type FormValues = {
-  folderName: string;
+  folderId: string;
+  folderPath: string[];
   extensions: string[];
 };
 
 type FolderFormProps = {
   submitText: string;
-  defaultFolderName?: string;
+  defaultFolderId?: string;
+  defaultFolderPath?: string[];
   defaultFolderExtenstions?: string[];
   handleSubmit: (values: FormValues) => void;
 };
@@ -16,7 +18,8 @@ type FolderFormProps = {
 export const FolderForm = ({
   submitText,
   handleSubmit,
-  defaultFolderName = "",
+  defaultFolderId = "",
+  defaultFolderPath = [],
   defaultFolderExtenstions = [],
 }: FolderFormProps) => {
   return (
@@ -27,7 +30,15 @@ export const FolderForm = ({
         </ActionPanel>
       }
     >
-      <Form.TextField id="folderName" title="Folder Name" defaultValue={defaultFolderName} />
+      <Form.TextField id="folderId" title="Folder Identifier" defaultValue={defaultFolderId} />
+      <Form.FilePicker
+        id="folderPath"
+        title="Folder Path"
+        defaultValue={defaultFolderPath}
+        allowMultipleSelection={false}
+        canChooseDirectories
+        canChooseFiles={false}
+      />
       <Form.TagPicker id="extensions" title="Extensions" defaultValue={defaultFolderExtenstions}>
         {availableExtensions.map((extension) => (
           <Form.TagPicker.Item key={extension.value} value={extension.value} title={extension.title} />

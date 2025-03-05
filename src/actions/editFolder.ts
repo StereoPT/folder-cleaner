@@ -3,22 +3,22 @@ import { Folder } from "../types/folders";
 import { LocalStorage, showToast, Toast } from "@raycast/api";
 
 type EditFolderProps = {
-  folderName: string;
+  folderId: string;
   editedFolder: Folder;
   existingFolders: Folder[];
   setFolders: Dispatch<SetStateAction<Folder[]>>;
 };
 
-export const EditFolder = async ({ folderName, editedFolder, existingFolders, setFolders }: EditFolderProps) => {
-  const foundFolder = existingFolders.find((f) => f.name === folderName);
+export const EditFolder = async ({ folderId, editedFolder, existingFolders, setFolders }: EditFolderProps) => {
+  const foundFolder = existingFolders.find((f) => f.id === folderId);
   if (!foundFolder) {
     throw new Error("Unable to find folder to edit");
   }
 
-  const newFolderList = existingFolders.map((f) => (f.name === foundFolder.name ? editedFolder : f));
+  const newFolderList = existingFolders.map((f) => (f.id === foundFolder.id ? editedFolder : f));
   setFolders(newFolderList);
 
-  await LocalStorage.removeItem(foundFolder.name);
-  await LocalStorage.setItem(editedFolder.name, JSON.stringify(editedFolder));
+  await LocalStorage.removeItem(foundFolder.id);
+  await LocalStorage.setItem(editedFolder.id, JSON.stringify(editedFolder));
   await showToast(Toast.Style.Success, "Folder Edited");
 };

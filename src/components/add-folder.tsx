@@ -19,7 +19,11 @@ const FolderFormSwitcher = (props: FolderFormSwitcherProps) => {
   switch (props.type) {
     case "create": {
       const handleSubmit = (values: FormValues) => {
-        const newFolder = { name: values.folderName, extensions: values.extensions };
+        const newFolder = {
+          id: values.folderId,
+          path: values.folderPath[0],
+          extensions: values.extensions,
+        };
         props.onCreate(newFolder);
 
         pop();
@@ -31,7 +35,11 @@ const FolderFormSwitcher = (props: FolderFormSwitcherProps) => {
       const { folder } = props;
 
       const handleSubmit = (values: FormValues) => {
-        const newFolder = { name: values.folderName, extensions: values.extensions };
+        const newFolder = {
+          id: values.folderId,
+          path: values.folderPath[0],
+          extensions: values.extensions,
+        };
         props.onEdit(props.folder, newFolder);
 
         pop();
@@ -40,7 +48,8 @@ const FolderFormSwitcher = (props: FolderFormSwitcherProps) => {
       return (
         <FolderForm
           submitText="Edit Folder"
-          defaultFolderName={folder.name}
+          defaultFolderId={folder.id}
+          defaultFolderPath={[folder.path]}
           defaultFolderExtenstions={folder.extensions}
           handleSubmit={handleSubmit}
         />

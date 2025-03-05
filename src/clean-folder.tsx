@@ -23,13 +23,12 @@ const CleanFolderCommand = () => {
       const currentPath = join(folderToClean, file);
       const extension = extname(file).toLocaleLowerCase();
 
-      for (const { name, extensions } of folders) {
+      for (const { path, extensions } of folders) {
         if (extensions.includes(extension)) {
           moveOrDelete({
-            folder: name,
             file,
             currentPath,
-            folderPath: folderToClean,
+            folderPath: path,
           });
         }
       }

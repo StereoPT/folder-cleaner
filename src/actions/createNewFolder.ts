@@ -9,14 +9,14 @@ type CreateNewFolderProps = {
 };
 
 export const CreateNewFolder = async ({ newFolder, existingFolders, setFolders }: CreateNewFolderProps) => {
-  const checkFolderName = existingFolders.find((f) => f.name === newFolder.name);
+  const checkFolderName = existingFolders.find((f) => f.id === newFolder.id);
   if (checkFolderName) {
-    throw new Error("Folder with same name already exists");
+    throw new Error("Folder with same ID already exists");
   }
 
   const newFolderList = [...existingFolders, newFolder];
   setFolders(newFolderList);
 
-  await LocalStorage.setItem(newFolder.name, JSON.stringify(newFolder));
+  await LocalStorage.setItem(newFolder.id, JSON.stringify(newFolder));
   await showToast(Toast.Style.Success, "Folder Created", "Will be used to clean your files");
 };

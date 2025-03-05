@@ -12,14 +12,13 @@ export const isFile = ({ filename, folderPath }: isFileArgs) => {
 };
 
 type moveOrDeleteArgs = {
-  folder: string;
   file: string;
   currentPath: string;
   folderPath: string;
 };
 
-export const moveOrDelete = ({ folder, file, currentPath, folderPath }: moveOrDeleteArgs) => {
-  const newPath = join(folderPath, folder, file);
+export const moveOrDelete = ({ file, currentPath, folderPath }: moveOrDeleteArgs) => {
+  const newPath = join(folderPath, file);
 
   if (!existsSync(newPath)) {
     renameSync(currentPath, newPath);

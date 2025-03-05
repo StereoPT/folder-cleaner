@@ -1,4 +1,5 @@
 export type Folder = {
-  name: string;
+  id: string;
+  path: string;
   extensions: string[];
 };
