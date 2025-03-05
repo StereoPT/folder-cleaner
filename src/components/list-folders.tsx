@@ -4,8 +4,9 @@ import { Folder } from "../types/folders";
 import { useFetchStoredFolders } from "../hooks/useFetchStoredFolders";
 import { AddFoldersAction } from "./add-folder";
 import { CreateNewFolder } from "../actions/createNewFolder";
+import { DeleteFolder } from "../actions/deleteFolder";
 
-const SetupFolders = () => {
+const ListFolders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [folders, setFolders] = useState<Folder[]>([]);
 
@@ -16,6 +17,14 @@ const SetupFolders = () => {
       await CreateNewFolder({ newFolder: folder, existingFolders: folders, setFolders });
     } catch (e) {
       await showToast(Toast.Style.Failure, "Folder not created", "Something went wrong!");
+    }
+  };
+
+  const deleteFolder = async (folderName: string) => {
+    try {
+      await DeleteFolder({ folderName, existingFolders: folders, setFolders });
+    } catch (e) {
+      await showToast(Toast.Style.Failure, "Folder not deleted", "Something went wrong!");
     }
   };
 
@@ -50,6 +59,7 @@ const SetupFolders = () => {
             actions={
               <ActionPanel>
                 <AddFoldersAction onCreate={createNewFolder} />
+                <Action icon={Icon.Trash} title="Delete Folder" onAction={() => deleteFolder(folder.name)} />
               </ActionPanel>
             }
           />
@@ -59,6 +69,6 @@ const SetupFolders = () => {
   );
 };
 
-export const SetupFoldersAction = () => {
-  return <Action.Push icon={Icon.Cog} title="Setup Folders" target={<SetupFolders />} />;
+export const ListFoldersAction = () => {
+  return <Action.Push icon={Icon.Cog} title="List Folders" target={<ListFolders />} />;
 };

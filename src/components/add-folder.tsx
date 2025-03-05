@@ -42,5 +42,5 @@ type AddFoldersActionProps = {
 };
 
 export const AddFoldersAction = ({ onCreate }: AddFoldersActionProps) => {
-  return <Action.Push icon={Icon.Plus} title="Add Folder" target={<AddFolder onCreate={onCreate} />} />;
+  return <Action.Push icon={Icon.PlusCircle} title="Add Folder" target={<AddFolder onCreate={onCreate} />} />;
 };

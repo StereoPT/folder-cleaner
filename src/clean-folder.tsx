@@ -6,7 +6,7 @@ import { moveOrDelete } from "./utils/files";
 import { Preferences } from "./types/preferences";
 
 import { extname, join } from "node:path";
-import { SetupFoldersAction } from "./components/setup-folders";
+import { ListFoldersAction } from "./components/list-folders";
 import { useFetchFolderFiles } from "./hooks/useFetchFolderFiles";
 import { Folder } from "./types/folders";
 import { useFetchStoredFolders } from "./hooks/useFetchStoredFolders";
@@ -47,7 +47,7 @@ const CleanFolderCommand = () => {
       navigationTitle="Files inside Folder"
       actions={
         <ActionPanel>
-          <SetupFoldersAction />
+          <ListFoldersAction />
         </ActionPanel>
       }
     >
@@ -62,7 +62,7 @@ const CleanFolderCommand = () => {
                 <Action title="Clean All" onAction={cleanAllFiles} />
               </ActionPanel.Section>
               <ActionPanel.Section title="Settings">
-                <SetupFoldersAction />
+                <ListFoldersAction />
               </ActionPanel.Section>
             </ActionPanel>
           }
