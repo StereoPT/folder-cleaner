@@ -5,7 +5,7 @@ import { isFile } from "../utils/files";
 import { buildException } from "../utils/buildException";
 
 export const useFetchFolderFiles = (folderToClean: string) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [folderFiles, setFolderFiles] = useState<string[]>([]);
 
   useEffect(() => {

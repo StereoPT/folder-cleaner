@@ -13,7 +13,7 @@ import { useFetchStoredFolders } from "./hooks/useFetchStoredFolders";
 const CleanFolderCommand = () => {
   const { folderToClean } = getPreferenceValues<Preferences>();
 
-  const { folders, isLoading: isLoadingFolders } = useFetchStoredFolders();
+  const { folders, isLoading: isLoadingFolders, refetchFolders } = useFetchStoredFolders();
   const { folderFiles, isLoading: isLoadingFiles } = useFetchFolderFiles(folderToClean);
 
   const isLoading = isLoadingFolders && isLoadingFiles;
@@ -43,7 +43,7 @@ const CleanFolderCommand = () => {
       navigationTitle="Files inside Folder"
       actions={
         <ActionPanel>
-          <ListFoldersAction />
+          <ListFoldersAction refetchFolders={refetchFolders} />
         </ActionPanel>
       }
     >
@@ -60,7 +60,7 @@ const CleanFolderCommand = () => {
                 </ActionPanel.Section>
               )}
               <ActionPanel.Section title="Settings">
-                <ListFoldersAction />
+                <ListFoldersAction refetchFolders={refetchFolders} />
               </ActionPanel.Section>
             </ActionPanel>
           }

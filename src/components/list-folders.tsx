@@ -77,6 +77,10 @@ const ListFolders = () => {
   );
 };
 
-export const ListFoldersAction = () => {
-  return <Action.Push icon={Icon.Cog} title="List Folders" target={<ListFolders />} />;
+type ListFoldersActionProps = {
+  refetchFolders: () => void;
+};
+
+export const ListFoldersAction = ({ refetchFolders }: ListFoldersActionProps) => {
+  return <Action.Push icon={Icon.Cog} title="List Folders" target={<ListFolders />} onPop={() => refetchFolders()} />;
 };
