@@ -2,9 +2,10 @@ import { Action, ActionPanel, Icon, List, showToast, Toast } from "@raycast/api"
 import { useState } from "react";
 import { Folder } from "../types/folders";
 import { useFetchStoredFolders } from "../hooks/useFetchStoredFolders";
-import { AddFoldersAction } from "./add-folder";
+import { AddFoldersAction, EditFolderAction } from "./add-folder";
 import { CreateNewFolder } from "../actions/createNewFolder";
 import { DeleteFolder } from "../actions/deleteFolder";
+import { EditFolder } from "../actions/editFolder";
 
 const ListFolders = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,6 +18,14 @@ const ListFolders = () => {
       await CreateNewFolder({ newFolder: folder, existingFolders: folders, setFolders });
     } catch (e) {
       await showToast(Toast.Style.Failure, "Folder not created", "Something went wrong!");
+    }
+  };
+
+  const editFolder = async (oldFolder: Folder, newFolder: Folder) => {
+    try {
+      await EditFolder({ folderName: oldFolder.name, editedFolder: newFolder, existingFolders: folders, setFolders });
+    } catch (e) {
+      await showToast(Toast.Style.Failure, "Folder not edited", "Something went wrong!");
     }
   };
 
@@ -59,6 +68,7 @@ const ListFolders = () => {
             actions={
               <ActionPanel>
                 <AddFoldersAction onCreate={createNewFolder} />
+                <EditFolderAction folder={folder} onEdit={editFolder} />
                 <Action icon={Icon.Trash} title="Delete Folder" onAction={() => deleteFolder(folder.name)} />
               </ActionPanel>
             }

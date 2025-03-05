@@ -7,15 +7,29 @@ type FormValues = {
   extensions: string[];
 };
 
-type AddFolderProps = {
-  onCreate: (folder: Folder) => void;
-};
+type FolderFormProps =
+  | {
+      type: "create";
+      onCreate: (folder: Folder) => void;
+    }
+  | {
+      type: "edit";
+      folder: Folder;
+      onEdit: (oldFolder: Folder, newFolder: Folder) => void;
+    };
 
-const AddFolder = ({ onCreate }: AddFolderProps) => {
+const FolderForm = (props: FolderFormProps) => {
   const { pop } = useNavigation();
 
   const handleSubmit = (values: FormValues) => {
-    onCreate({ name: values.folderName, extensions: values.extensions });
+    const newFolder = { name: values.folderName, extensions: values.extensions };
+
+    if (props.type === "create") {
+      props.onCreate(newFolder);
+    } else if (props.type === "edit") {
+      props.onEdit(props.folder, newFolder);
+    }
+
     pop();
   };
 
@@ -23,12 +37,12 @@ const AddFolder = ({ onCreate }: AddFolderProps) => {
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Add Folder" onSubmit={handleSubmit} />
+          <Action.SubmitForm title={props.type === "create" ? "Add Folder" : "Edit Folder"} onSubmit={handleSubmit} />
         </ActionPanel>
       }
     >
-      <Form.TextField id="folderName" title="Folder Name" />
-      <Form.TagPicker id="extensions" title="Extensions">
+      <Form.TextField id="folderName" title="Folder Name" value={props.type === "edit" ? props.folder.name : ""} />
+      <Form.TagPicker id="extensions" title="Extensions" value={props.type === "edit" ? props.folder.extensions : []}>
         {availableExtensions.map((extension) => (
           <Form.TagPicker.Item key={extension.value} value={extension.value} title={extension.title} />
         ))}
@@ -42,5 +56,22 @@ type AddFoldersActionProps = {
 };
 
 export const AddFoldersAction = ({ onCreate }: AddFoldersActionProps) => {
-  return <Action.Push icon={Icon.PlusCircle} title="Add Folder" target={<AddFolder onCreate={onCreate} />} />;
+  return (
+    <Action.Push icon={Icon.PlusCircle} title="Add Folder" target={<FolderForm type="create" onCreate={onCreate} />} />
+  );
+};
+
+type EditFolderActionProps = {
+  folder: Folder;
+  onEdit: (oldFolder: Folder, newFolder: Folder) => void;
+};
+
+export const EditFolderAction = ({ folder, onEdit }: EditFolderActionProps) => {
+  return (
+    <Action.Push
+      icon={Icon.Pencil}
+      title="Edit Folder"
+      target={<FolderForm type="edit" folder={folder} onEdit={onEdit} />}
+    />
+  );
 };
