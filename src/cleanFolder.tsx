@@ -40,6 +40,8 @@ const CleanFolderCommand = () => {
     }
   }, [folderFiles, folders]);
 
+  const listIsEmpty = folderFiles.length <= 0;
+
   return (
     <List
       isLoading={isLoading}
@@ -50,25 +52,33 @@ const CleanFolderCommand = () => {
         </ActionPanel>
       }
     >
-      {folderFiles.map((file) => (
-        <List.Item
-          key={file}
-          icon={Icon.Document}
-          title={file}
-          actions={
-            <ActionPanel>
-              {folders.length > 0 && (
-                <ActionPanel.Section title="Cleaner Actions">
-                  <Action title="Clean All" onAction={cleanAllFiles} />
-                </ActionPanel.Section>
-              )}
-              <ActionPanel.Section title="Settings">
-                <ListFoldersAction refetchFolders={refetchFolders} />
-              </ActionPanel.Section>
-            </ActionPanel>
-          }
+      {listIsEmpty ? (
+        <List.EmptyView
+          icon={Icon.Box}
+          title="No Files Found"
+          description="Oops! Looks like there are no files in your folder."
         />
-      ))}
+      ) : (
+        folderFiles.map((file) => (
+          <List.Item
+            key={file}
+            icon={Icon.Document}
+            title={file}
+            actions={
+              <ActionPanel>
+                {folders.length > 0 && (
+                  <ActionPanel.Section title="Cleaner Actions">
+                    <Action title="Clean All" onAction={cleanAllFiles} />
+                  </ActionPanel.Section>
+                )}
+                <ActionPanel.Section title="Settings">
+                  <ListFoldersAction refetchFolders={refetchFolders} />
+                </ActionPanel.Section>
+              </ActionPanel>
+            }
+          />
+        ))
+      )}
     </List>
   );
 };

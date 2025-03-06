@@ -9,8 +9,12 @@ type isFileArgs = {
 };
 
 export const isFile = ({ filename, folderPath }: isFileArgs) => {
-  const filePath = join(folderPath, filename);
-  return lstatSync(filePath).isFile();
+  try {
+    const filePath = join(folderPath, filename);
+    return lstatSync(filePath).isFile();
+  } catch {
+    return false;
+  }
 };
 
 type moveOrDeleteArgs = {
