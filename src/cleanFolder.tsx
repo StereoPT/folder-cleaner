@@ -1,9 +1,8 @@
 import { useCallback } from "react";
 
-import { Action, ActionPanel, getPreferenceValues, Icon, List, showHUD } from "@raycast/api";
+import { Action, ActionPanel, getPreferenceValues, Icon, List, showHUD, showToast, Toast } from "@raycast/api";
 
 import { moveOrDelete } from "./utils/files";
-import { Preferences } from "./types/preferences";
 
 import { extname, join } from "node:path";
 import { ListFoldersAction } from "./components/list-folders";
@@ -11,30 +10,34 @@ import { useFetchFolderFiles } from "./hooks/useFetchFolderFiles";
 import { useFetchStoredFolders } from "./hooks/useFetchStoredFolders";
 
 const CleanFolderCommand = () => {
-  const { folderToClean } = getPreferenceValues<Preferences>();
+  const { folderToClean } = getPreferenceValues();
 
   const { folders, isLoading: isLoadingFolders, refetchFolders } = useFetchStoredFolders();
   const { folderFiles, isLoading: isLoadingFiles } = useFetchFolderFiles(folderToClean);
 
-  const isLoading = isLoadingFolders && isLoadingFiles;
+  const isLoading = isLoadingFolders || isLoadingFiles;
 
   const cleanAllFiles = useCallback(() => {
-    for (const file of folderFiles) {
-      const currentPath = join(folderToClean, file);
-      const extension = extname(file).toLocaleLowerCase();
+    try {
+      for (const file of folderFiles) {
+        const currentPath = join(folderToClean, file);
+        const extension = extname(file).toLocaleLowerCase();
 
-      for (const { path, extensions } of folders) {
-        if (extensions.includes(extension)) {
-          moveOrDelete({
-            file,
-            currentPath,
-            folderPath: path,
-          });
+        for (const { path, extensions } of folders) {
+          if (extensions.includes(extension)) {
+            moveOrDelete({
+              file,
+              currentPath,
+              folderPath: path,
+            });
+          }
         }
       }
-    }
 
-    return showHUD("Folder Cleaned");
+      return showHUD("Folder Cleaned");
+    } catch (error) {
+      return showToast(Toast.Style.Failure, "Folder not Cleaned", "Something went wrong");
+    }
   }, [folderFiles, folders]);
 
   return (
