@@ -3,7 +3,7 @@
   "name": "folder-cleaner",
   "title": "Folder Cleaner",
   "description": "This extension will clean your desired folder",
-  "icon": "extension-icon.png",
+  "icon": "extension_icon.png",
   "author": "StereoPT",
   "categories": [
     "System",
