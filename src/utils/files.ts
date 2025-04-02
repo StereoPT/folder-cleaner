@@ -24,13 +24,16 @@ type moveOrDeleteArgs = {
 };
 
 export const moveOrDelete = async ({ file, currentPath, folderPath }: moveOrDeleteArgs) => {
-  try {
-    const newPath = join(folderPath, file);
+  const newPath = join(folderPath, file);
 
+  try {
     if (!existsSync(newPath)) {
       renameSync(currentPath, newPath);
+    } else {
+      // TODO: The file already exists, how do we handle this situation?
+      // TODO: Should I prompt the user to replace or rename?
     }
   } catch (error) {
-    captureException(buildException(error as Error, "Failed to move file", { file, currentPath, folderPath }));
+    captureException(buildException(error as Error, "Failed to move file", { currentPath, newPath }));
   }
 };
