@@ -1,10 +1,12 @@
-import { captureException } from "@raycast/api";
+import { captureException, getPreferenceValues } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import { readdir } from "node:fs/promises";
 import { isFile } from "../utils/files";
 import { buildException } from "../utils/buildException";
 
-export const useFetchFolderFiles = (folderToClean: string) => {
+export const useFetchFolderFiles = () => {
+  const { folderToClean } = getPreferenceValues();
+
   const [isLoading, setIsLoading] = useState(true);
   const [folderFiles, setFolderFiles] = useState<string[]>([]);
 

@@ -1,6 +1,16 @@
 import { useCallback } from "react";
 
-import { Action, ActionPanel, getPreferenceValues, Icon, List, showHUD, showToast, Toast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  captureException,
+  getPreferenceValues,
+  Icon,
+  List,
+  showHUD,
+  showToast,
+  Toast,
+} from "@raycast/api";
 
 import { moveOrDelete } from "./utils/files";
 
@@ -9,12 +19,13 @@ import { ListFoldersAction } from "./components/list-folders";
 import { useFetchFolderFiles } from "./hooks/useFetchFolderFiles";
 import { useLocalStorage } from "@raycast/utils";
 import { Folder } from "./types/folders";
+import { buildException } from "./utils/buildException";
 
 const CleanFolderCommand = () => {
   const { folderToClean } = getPreferenceValues();
 
   const { value: folders, isLoading: isLoadingFolders } = useLocalStorage<Folder[]>("folders", []);
-  const { folderFiles, isLoading: isLoadingFiles, fetchFolderFiles } = useFetchFolderFiles(folderToClean);
+  const { folderFiles, isLoading: isLoadingFiles, fetchFolderFiles } = useFetchFolderFiles();
 
   const isLoading = isLoadingFolders || isLoadingFiles;
 
@@ -40,6 +51,7 @@ const CleanFolderCommand = () => {
       void fetchFolderFiles();
       return showHUD("Folder Cleaned");
     } catch (error) {
+      captureException(buildException(error as Error, "Folder not Cleaned", { folders, folderFiles }));
       return showToast(Toast.Style.Failure, "Folder not Cleaned", "Something went wrong");
     }
   }, [folderFiles, folders]);
