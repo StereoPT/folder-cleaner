@@ -128,5 +128,12 @@ const ListFolders = () => {
 };
 
 export const ListFoldersAction = () => {
-  return <Action.Push icon={Icon.Cog} title="List Folders" target={<ListFolders />} />;
+  return (
+    <Action.Push
+      icon={Icon.Cog}
+      title="List Folders"
+      target={<ListFolders />}
+      shortcut={{ key: "l", modifiers: ["ctrl"] }}
+    />
+  );
 };
