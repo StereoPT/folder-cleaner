@@ -1,5 +1,5 @@
 import { captureException } from "@raycast/api";
-import { existsSync, lstatSync, renameSync, rmSync } from "node:fs";
+import { existsSync, lstatSync, renameSync } from "node:fs";
 import { join } from "node:path";
 import { buildException } from "./buildException";
 
@@ -23,14 +23,12 @@ type moveOrDeleteArgs = {
   folderPath: string;
 };
 
-export const moveOrDelete = ({ file, currentPath, folderPath }: moveOrDeleteArgs) => {
+export const moveOrDelete = async ({ file, currentPath, folderPath }: moveOrDeleteArgs) => {
   try {
     const newPath = join(folderPath, file);
 
     if (!existsSync(newPath)) {
       renameSync(currentPath, newPath);
-    } else {
-      rmSync(currentPath);
     }
   } catch (error) {
     captureException(buildException(error as Error, "Failed to move file", { file, currentPath, folderPath }));

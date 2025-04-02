@@ -7,21 +7,26 @@ import { moveOrDelete } from "./utils/files";
 import { extname, join } from "node:path";
 import { ListFoldersAction } from "./components/list-folders";
 import { useFetchFolderFiles } from "./hooks/useFetchFolderFiles";
-import { useFetchStoredFolders } from "./hooks/useFetchStoredFolders";
+import { useLocalStorage } from "@raycast/utils";
+import { Folder } from "./types/folders";
 
 const CleanFolderCommand = () => {
   const { folderToClean } = getPreferenceValues();
 
-  const { folders, isLoading: isLoadingFolders, refetchFolders } = useFetchStoredFolders();
-  const { folderFiles, isLoading: isLoadingFiles } = useFetchFolderFiles(folderToClean);
+  const { value: folders, isLoading: isLoadingFolders } = useLocalStorage<Folder[]>("folders", []);
+  const { folderFiles, isLoading: isLoadingFiles, fetchFolderFiles } = useFetchFolderFiles(folderToClean);
 
   const isLoading = isLoadingFolders || isLoadingFiles;
 
   const cleanAllFiles = useCallback(() => {
     try {
+      if (!folders) return;
+
       for (const file of folderFiles) {
         const currentPath = join(folderToClean, file);
         const extension = extname(file).toLocaleLowerCase();
+
+        console.log(folders);
 
         for (const { path, extensions } of folders) {
           if (extensions.includes(extension)) {
@@ -34,6 +39,7 @@ const CleanFolderCommand = () => {
         }
       }
 
+      void fetchFolderFiles();
       return showHUD("Folder Cleaned");
     } catch (error) {
       return showToast(Toast.Style.Failure, "Folder not Cleaned", "Something went wrong");
@@ -47,7 +53,7 @@ const CleanFolderCommand = () => {
       isLoading={isLoading}
       actions={
         <ActionPanel>
-          <ListFoldersAction refetchFolders={refetchFolders} />
+          <ListFoldersAction />
         </ActionPanel>
       }
     >
@@ -65,13 +71,13 @@ const CleanFolderCommand = () => {
             title={file}
             actions={
               <ActionPanel>
-                {folders.length > 0 && (
+                {folders && folders.length > 0 && (
                   <ActionPanel.Section title="Cleaner Actions">
                     <Action title="Clean All" onAction={cleanAllFiles} icon={Icon.Checkmark} />
                   </ActionPanel.Section>
                 )}
                 <ActionPanel.Section title="Settings">
-                  <ListFoldersAction refetchFolders={refetchFolders} />
+                  <ListFoldersAction />
                 </ActionPanel.Section>
               </ActionPanel>
             }
