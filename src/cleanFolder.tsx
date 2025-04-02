@@ -26,8 +26,6 @@ const CleanFolderCommand = () => {
         const currentPath = join(folderToClean, file);
         const extension = extname(file).toLocaleLowerCase();
 
-        console.log(folders);
-
         for (const { path, extensions } of folders) {
           if (extensions.includes(extension)) {
             moveOrDelete({
