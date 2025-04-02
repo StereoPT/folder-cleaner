@@ -23,7 +23,7 @@ type moveOrDeleteArgs = {
   folderPath: string;
 };
 
-export const moveOrDelete = async ({ file, currentPath, folderPath }: moveOrDeleteArgs) => {
+export const moveOrDelete = ({ file, currentPath, folderPath }: moveOrDeleteArgs) => {
   const newPath = join(folderPath, file);
 
   try {
